@@ -16,10 +16,14 @@ move (a, b) x = case x of
 doMoves :: String -> [Location]
 doMoves = scanl move (0,0)
 
+getNonZero :: [Location] -> Int
+getNonZero locations =
+  let counts = map (head &&& length) $ group (sort locations)
+      nonZero = filter (\(_,b) -> b > 0) counts
+  in length nonZero
+
 main = do
   input <- readFile "input.txt"
   let locations = doMoves input
-      counts = map (head &&& length) $ group (sort locations)
-      nonZero = filter (\(_,b) -> b > 0) counts
-  print $ length nonZero
+  print $ getNonZero locations
 
