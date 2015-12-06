@@ -17,4 +17,4 @@ partOne = print $ find (hashStartsWithZeros 5) (lst 1)
 
 partTwo = print $ find (hashStartsWithZeros 6) (lst 282749)
 
-main = partOne
+main = partTwo
