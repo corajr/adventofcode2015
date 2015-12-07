@@ -1,6 +1,6 @@
 module Nice where
 
-import Text.Regex.TDFA
+import Text.Regex.PCRE
 
 vowels :: String -> Bool
 vowels x = (x =~ "[aeiou]" :: Int) >= 3
