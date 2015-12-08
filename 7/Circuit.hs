@@ -59,11 +59,13 @@ notGate = do
 
 binaryGate = do
   v1 <- value
-  op <- choice [ string "AND"
-               , string "OR"
-               , string "LSHIFT"
+  space
+  op <- choice [ try $ string "AND"
+               , try $ string "OR"
+               , try $ string "LSHIFT"
                , string "RSHIFT"
                ]
+  space
   v2 <- value
   case op of
     "AND" -> return $ And v1 v2

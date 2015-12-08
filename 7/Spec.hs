@@ -26,12 +26,14 @@ main = hspec $
               , Connection (G (And (W (Wire "x")) (W (Wire "y")))) (Wire "d")
               , Connection (G (Or (W (Wire "x")) (W (Wire "y")))) (Wire "e")
               , Connection (G (LShift (W (Wire "x")) (Lit 2))) (Wire "f")
-              , Connection (G (RShift (W (Wire "x")) (Lit 2))) (Wire "g")
+              , Connection (G (RShift (W (Wire "y")) (Lit 2))) (Wire "g")
               , Connection (G (Not (W (Wire "x")))) (Wire "h")
-              , Connection (G (Not (W (Wire "x")))) (Wire "i")
+              , Connection (G (Not (W (Wire "y")))) (Wire "i")
               ]
     it "should parse a file" $ do
       let circ = parseFromFile circuit "input.txt"
-      circ >>= (`shouldSatisfy` (\x -> length x == 8))
-    it "should result in these signals" $ do
-      pending
+      circ >>= (\e ->
+        case e of
+          Left err -> error (show err)
+          Right xs -> return xs)
+        >>= (`shouldSatisfy` (\xs -> length xs == 339))
