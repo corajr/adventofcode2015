@@ -2,6 +2,7 @@ module Circuit where
 
 import Text.ParserCombinators.Parsec
 import Control.Applicative hiding ((<|>), many)
+import Control.Monad
 import Data.Word
 
 
@@ -18,8 +19,8 @@ data Signal = V Value
 
 data Gate = And Value Value
           | Or Value Value
-          | LShift Value Value
-          | RShift Value Value
+          | LShift Value Int
+          | RShift Value Int
           | Not Value
           deriving (Show, Eq)
 
@@ -66,12 +67,11 @@ binaryGate = do
                , string "RSHIFT"
                ]
   space
-  v2 <- value
   case op of
-    "AND" -> return $ And v1 v2
-    "OR" -> return $ Or v1 v2
-    "LSHIFT" -> return $ LShift v1 v2
-    "RSHIFT" -> return $ RShift v1 v2
+    "AND" -> liftM (And v1) value
+    "OR" -> liftM (Or v1) value
+    "LSHIFT" -> liftM (LShift v1 . fromIntegral) lit
+    "RSHIFT" -> liftM (RShift v1 . fromIntegral) lit
     _ -> fail "No operation matched"
 
 eol = (char '\n' <|> (char '\r' >> option '\n' (char '\n'))) >> return ()
