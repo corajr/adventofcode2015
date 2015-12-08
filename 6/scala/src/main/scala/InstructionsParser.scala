@@ -5,7 +5,7 @@ object InstructionsParser extends RegexParsers {
   def integer     = """(0|[1-9]\d*)""".r ^^ { _.toInt }
   def region      = repsep(integer, ",") ^^ { case Seq(x,y) => (x,y) }
   def task        = "turn on" ^^ (_ => TurnOn) |
-                    "turn off" ^^ (_ => TurnOn) |
+                    "turn off" ^^ (_ => TurnOff) |
                     "toggle" ^^ (_ => Toggle)
   def instructions = instruction*
   def instruction : Parser[Instruction] = task~region~"through"~region ^^
