@@ -30,7 +30,7 @@ apply solution conn@(Connection sig (Wire wire)) =
           And v1 v2 -> liftM2 (.&.) (get v1) (get v2)
           Or v1 v2 -> liftM2 (.|.) (get v1) (get v2)
           LShift v1 i -> liftM2 shiftL (get v1) (Just i)
-          RShift v1 i -> liftM2 shiftL (get v1) (Just i)
+          RShift v1 i -> liftM2 shiftR (get v1) (Just i)
           Not v1 -> liftM complement (get v1)
 
 find :: Solution -> Value -> Maybe Word16
