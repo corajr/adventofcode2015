@@ -1,7 +1,8 @@
 import Test.Hspec
 import Circuit
-import Control.Exception (evaluate)
+import Solve
 import Text.ParserCombinators.Parsec (parse, parseFromFile)
+import qualified Data.Map.Strict as Map
 
 simpleCircuit =
   unlines [ "123 -> x"
@@ -14,8 +15,19 @@ simpleCircuit =
           , "NOT y -> i"
           ]
 
+circSolution =
+  Map.fromList [ ("d", 72)
+               , ("e", 507)
+               , ("f", 492)
+               , ("g", 114)
+               , ("h", 65412)
+               , ("i", 65079)
+               , ("x", 123)
+               , ("y", 456)
+               ]
+
 main :: IO ()
-main = hspec $
+main = hspec $ do
   describe "Circuit" $ do
     it "should parse one gate" $
       parse connection "" "123 -> x\n" `shouldBe` Right (Connection (V (Lit 123)) (Wire "x"))
@@ -37,3 +49,8 @@ main = hspec $
           Left err -> error (show err)
           Right xs -> return xs)
         >>= (`shouldSatisfy` (\xs -> length xs == 339))
+  describe "solve" $
+    it "should result in the following signals for a simple circuit" $ do
+      let eCirc = parse circuit "" simpleCircuit
+      case eCirc of
+        Right circ -> solve circ `shouldBe` circSolution
