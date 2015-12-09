@@ -11,6 +11,12 @@ partOne input = do
   let quotedLengths = sum (map length xs)
   return $ quotedLengths - sum (map (length . unQuoted) result)
 
+partTwo input =
+  let xs = lines input
+      orig = sum (map length xs)
+      new = sum (map (length . show) xs)
+  in new - orig
+
 main = do
   input <- readFile "input.txt"
-  print $ partOne input
+  print $ partTwo input
