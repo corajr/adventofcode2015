@@ -1,14 +1,16 @@
 module Strings where
 
-import qualified Data.ByteString as B
-import qualified Data.Text as T
-import Data.Text.Encoding as E
+import Escapes
+import Text.ParserCombinators.Parsec (parse)
+import Text.Parsec.Error (ParseError)
 
+partOne :: String -> Either ParseError Int
 partOne input = do
+  result <- parse pQuotedStrings "" input
   let xs = lines input
-  let unescaped = map (read :: String -> T.Text) xs
-  print $ sum (map length xs) - sum (map T.length  unescaped)
+  let quotedLengths = sum (map length xs)
+  return $ quotedLengths - sum (map (length . unQuoted) result)
 
 main = do
   input <- readFile "input.txt"
-  partOne input
+  print $ partOne input
