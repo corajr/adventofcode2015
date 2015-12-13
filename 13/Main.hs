@@ -5,4 +5,4 @@ import Seating
 main = do
   input <- readFile "input.txt"
   let values = parseValues input
-  print values
+  print $ maxValue values
