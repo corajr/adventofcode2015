@@ -4,8 +4,8 @@ import Text.Regex.PCRE
 import Data.Char (ord, chr)
 import Data.List (intercalate, mapAccumR, find)
 
-findNextPassword input =
-  find requirements (iterate inc input)
+findNextPassword =
+  find requirements . drop 1 . iterate inc
 
 inc :: String -> String
 inc = snd . mapAccumR f 1

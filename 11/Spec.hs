@@ -39,5 +39,7 @@ main = hspec $ do
   describe "findNextPassword" $ do
     it "should find the next password after abcdefgh" $
       findNextPassword "abcdefgh" `shouldBe` Just "abcdffaa"
-    it "should find the next password after ghijklmn" $
+    it "should find the next password after ghjaaaaa" $
       findNextPassword "ghjaaaaa" `shouldBe` Just "ghjaabcc"
+    it "should not return the same password" $
+      findNextPassword "abcdffaa" `shouldBe` Just "abcdffbb"

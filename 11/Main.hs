@@ -5,4 +5,6 @@ input = "hepxcrrq"
 
 partOne = findNextPassword input
 
-main = print partOne
+partTwo = fmap findNextPassword $ findNextPassword input
+
+main = print partTwo
