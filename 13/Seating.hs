@@ -2,7 +2,8 @@ module Seating where
 
 import Text.Regex.PCRE
 import Data.Array.Unboxed
-import Data.List (nub, elemIndex)
+import Data.List (nub, elemIndex, permutations, maximumBy)
+import Data.Ord (comparing)
 import Data.Maybe (fromMaybe)
 
 type Person = String
@@ -51,5 +52,11 @@ window n lst@(_:xs)
   | length lst < n = []
   | otherwise = take n lst : window n xs
 
+circPermute n =
+  map (\xs -> xs ++ [head xs]) $ permutations [0..n-1]
+
 maxValue :: HappyInfo -> Int
-maxValue _ = 0
+maxValue (HappyInfo people values) = totalChange $ maximumBy (comparing totalChange) arrangements
+  where arrangements = circPermute (length people)
+        totalChange lst = sum (map (\([a, b]) -> values ! (a,b) + values ! (b,a)) (window 2 lst))
+ 

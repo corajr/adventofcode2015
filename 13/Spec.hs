@@ -34,7 +34,7 @@ main = do
         parseFact sample2 `shouldBe` Datum "Alice" (-79) "Carol"
       it "should, when mapped, parse a sample set of facts" $
         map parseFact (lines test_input) `shouldBe` sampleData
-    describe "factsToInfo" $ do
+    describe "factsToInfo" $
       it "should process a sample set of facts" $
         factsToInfo sampleData `shouldBe` sampleInfo
     describe "maxValue" $
