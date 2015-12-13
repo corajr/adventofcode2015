@@ -21,5 +21,6 @@ executable x9
   -- other-extensions:    
   build-depends:       base >=4.7 && <5
                      , regex-pcre-builtin
+                     , array
   -- hs-source-dirs:      
   default-language:    Haskell2010
