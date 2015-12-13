@@ -9,7 +9,7 @@ findNextPassword input =
 
 inc :: String -> String
 inc = snd . mapAccumR f 1
-  where f acc x | ord x == ord 'z' = (1, 'a')
+  where f acc x | acc + ord x == ord 'z' + 1 = (1, 'a')
                 | otherwise = (0, chr (acc + ord x))
 
 requirements :: String -> Bool

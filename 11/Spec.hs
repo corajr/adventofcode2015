@@ -9,6 +9,7 @@ main = hspec $ do
       take 5 (iterate inc "xx") `shouldBe` ["xx", "xy", "xz", "ya", "yb"]
     it "should increment 8-char strings" $ do
       inc "aaaazzzz" `shouldBe` "aaabaaaa"
+      inc "abcdfzyz" `shouldBe` "abcdfzza"
       inc "abcdfezz" `shouldBe` "abcdffaa"
   describe "straight" $ do
     it "should accept `hijklmmn`" $
