@@ -4,6 +4,10 @@ import Test.Hspec
 import Password
 
 main = hspec $ do
+  describe "inc" $ do
+    it "should increment strings of letters" $ do
+      take 5 (iterate inc "xx") `shouldBe` ["xx", "xy", "xz", "ya", "yb"]
+
   describe "straight" $ do
     it "should accept `hijklmmn`" $
       "hijklmmn" `shouldSatisfy` straight

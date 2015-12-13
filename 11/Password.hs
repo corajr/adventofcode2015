@@ -2,10 +2,12 @@ module Password where
 
 import Text.Regex.PCRE
 import Data.Char (ord, chr)
-import Data.List (intercalate)
+import Data.List (intercalate, mapAccumR)
 
 inc :: String -> String
-inc = undefined
+inc = snd . mapAccumR f 1
+  where f acc x | ord x == ord 'z' = (1, 'a')
+                | otherwise = (0, chr (acc + ord x))
 
 requirements :: String -> Bool
 requirements inp = all ($ inp) [straight, unambiguous, twoPairs]
