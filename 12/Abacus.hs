@@ -12,5 +12,6 @@ getNumbers = getNums . fromMaybe Null . decode
   where getNums :: Value -> [Integer]
         getNums (Number v) = [floor v]
         getNums (Array xs) = concatMap getNums xs
-        getNums (Object o) = concatMap getNums (M.elems o)
+        getNums (Object o) = let vs = M.elems o
+                             in if "red" `elem` vs then [] else concatMap getNums vs
         getNums _ = []
