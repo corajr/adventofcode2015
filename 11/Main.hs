@@ -1,6 +1,6 @@
 module Main where
 
-import Password (inc, requirements)
+import Password (findNextPassword)
 input = "hepxcrrq"
 
 partOne = findNextPassword input
