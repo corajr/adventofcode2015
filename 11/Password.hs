@@ -2,7 +2,10 @@ module Password where
 
 import Text.Regex.PCRE
 import Data.Char (ord, chr)
-import Data.List (intercalate, mapAccumR)
+import Data.List (intercalate, mapAccumR, find)
+
+findNextPassword input =
+  find requirements (iterate inc input)
 
 inc :: String -> String
 inc = snd . mapAccumR f 1
