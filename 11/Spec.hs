@@ -5,8 +5,11 @@ import Password
 
 main = hspec $ do
   describe "inc" $ do
-    it "should increment strings of letters" $ do
+    it "should increment short strings of letters" $
       take 5 (iterate inc "xx") `shouldBe` ["xx", "xy", "xz", "ya", "yb"]
+    it "should increment 8-char strings" $ do
+      inc "aaaazzzz" `shouldBe` "aaabaaaa"
+      inc "abcdfezz" `shouldBe` "abcdffaa"
   describe "straight" $ do
     it "should accept `hijklmmn`" $
       "hijklmmn" `shouldSatisfy` straight
