@@ -30,7 +30,13 @@ parseFact l =
 
 
 parseValues :: String -> HappyInfo
-parseValues = factsToInfo . map parseFact . lines
+parseValues = factsToInfo . addMe . map parseFact . lines
+
+addMe :: [Datum] -> [Datum]
+addMe facts =
+  let people = getPeople facts
+      towardMe x = [Datum "Me" 0 x, Datum x 0 "Me"]
+  in facts ++ concatMap towardMe people
 
 getPeople = nub . concatMap (\(Datum p1 _ p2) -> [p1, p2])
 
