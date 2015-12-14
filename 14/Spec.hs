@@ -25,8 +25,16 @@ main = hspec $ do
       getDists (race 1 constraints) `shouldBe` Map.fromList [("Comet", 14), ("Dancer", 16)]
     it "after 10 seconds, should give Comet: 140, Dancer: 160" $
       getDists (race 10 constraints) `shouldBe` Map.fromList [("Comet", 140), ("Dancer", 160)]
-    it "after 10 seconds, should give Comet: 140, Dancer: 176" $
+    it "after 11 seconds, should give Comet: 140, Dancer: 176" $
       getDists (race 11 constraints) `shouldBe` Map.fromList [("Comet", 140), ("Dancer", 176)]
+    it "after 138 seconds, should give Comet: 140, Dancer: 176" $
+      getDists (race 138 constraints) `shouldBe` Map.fromList [("Comet", 140), ("Dancer", 176)]
+    it "after 148 seconds, should give Comet: 280, Dancer: 176" $
+      getDists (race 148 constraints) `shouldBe` Map.fromList [("Comet", 280), ("Dancer", 176)]
+    it "after 174 seconds, should give Comet: 280, Dancer: 176" $
+      getDists (race 174 constraints) `shouldBe` Map.fromList [("Comet", 280), ("Dancer", 176)]
+    it "after 185 seconds, should give Comet: 280, Dancer: 352" $
+      getDists (race 185 constraints) `shouldBe` Map.fromList [("Comet", 280), ("Dancer", 352)]
   describe "maxDistance" $
       it "should give 1120 in the sample situation" $
         maxDistance 1000 constraints `shouldBe` 1120
