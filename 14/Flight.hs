@@ -2,13 +2,15 @@ module Flight where
 
 import Text.Regex.PCRE
 import qualified Data.Map.Strict as Map
+import Control.Monad.Trans.RWS.Strict
+import Control.Monad (replicateM_, forM_)
 import Data.List (maximumBy)
 import Data.Ord (comparing)
 
 type Reindeer = String
 
 data Constraint = Constraint
-           { subject :: Reindeer
+           { name :: Reindeer
            , kmPerSec :: Int
            , fliesFor :: Int
            , mustRest :: Int
@@ -22,6 +24,8 @@ data Distance = Distance
 
 type Distances = Map.Map String Distance
 
+type Race = RWS [Constraint] () Distances ()
+
 constraintRegex = "(\\w+) can fly (\\d+) km/s for (\\d+) seconds, but then must rest for (\\d+) seconds."
 
 parseConstraint :: String -> Constraint
@@ -29,8 +33,33 @@ parseConstraint l =
   let [_, s, k, f, m] = getAllTextSubmatches (l =~ constraintRegex :: (AllTextSubmatches [] String))
   in Constraint s (read k) (read f) (read m)
 
+resetTime :: Constraint -> Distance -> Distance
+resetTime c d = d { flightTimeLeft = fliesFor c
+                  , restTimeLeft = mustRest c }
+
+mtDistance = Distance 0 0 0
+
+starting :: [Constraint] -> Distances
+starting constraints = Map.fromList [(name x, f x) | x <- constraints]
+  where f c = resetTime c mtDistance
+
+step :: Race
+step = do
+  constraints <- ask
+  forM_ constraints $ \c -> do
+    dists <- get
+    put (Map.adjust (step1 c) (name c) dists)
+
+step1 :: Constraint -> Distance -> Distance
+step1 c d | flightTimeLeft d == 0 = d { restTimeLeft = restTimeLeft d - 1}
+          | restTimeLeft d == 0 = step1 c (resetTime c d)
+          | otherwise = d { flightTimeLeft = flightTimeLeft d - 1
+                          , distance = distance d + kmPerSec c }
+
 race :: Int -> [Constraint] -> Distances
-race seconds constraints = Map.empty
+race seconds constraints =
+  let startState = starting constraints
+  in fst $ execRWS (replicateM_ seconds step) constraints startState
 
 maxDistance :: Int -> [Constraint] -> Int
 maxDistance i c = distance . maximumBy (comparing distance) . Map.elems $ race i c
