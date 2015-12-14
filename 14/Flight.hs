@@ -50,10 +50,11 @@ step = do
     modify (Map.adjust (step1 c) (name c))
 
 step1 :: Constraint -> Distance -> Distance
-step1 c d | flightTimeLeft d == 0 = d { restTimeLeft = restTimeLeft d - 1}
-          | restTimeLeft d == 0 = resetTime c d
-          | otherwise = d { flightTimeLeft = flightTimeLeft d - 1
-                          , distance = distance d + kmPerSec c }
+step1 c d
+  | restTimeLeft d == 0 = resetTime c d
+  | flightTimeLeft d == 0 = d { restTimeLeft = restTimeLeft d - 1}
+  | otherwise = d { flightTimeLeft = flightTimeLeft d - 1
+                  , distance = distance d + kmPerSec c }
 
 race :: Int -> [Constraint] -> Distances
 race seconds constraints =
