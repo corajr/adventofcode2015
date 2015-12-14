@@ -4,8 +4,6 @@ import Text.Regex.PCRE
 import qualified Data.Map.Strict as Map
 import Control.Monad.Trans.RWS.Strict
 import Control.Monad (replicateM_, forM_)
-import Data.List (maximumBy)
-import Data.Ord (comparing)
 
 type Reindeer = String
 
@@ -63,4 +61,4 @@ race seconds constraints =
   in fst $ execRWS (replicateM_ seconds step) constraints startState
 
 maxDistance :: Int -> [Constraint] -> Int
-maxDistance i c = distance . maximumBy (comparing distance) . Map.elems $ race i c
+maxDistance i c = maximum . map distance . Map.elems $ race i c

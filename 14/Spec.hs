@@ -67,6 +67,12 @@ main = do
         getDists (race 174 constraints) `shouldBe` Map.fromList [("Comet", 280), ("Dancer", 176)]
       it "after 185 seconds, should give Comet: 280, Dancer: 352" $
         getDists (race 185 constraints) `shouldBe` Map.fromList [("Comet", 280), ("Dancer", 352)]
-    describe "maxDistance" $
+      it "after 1000 seconds, should give Comet: 1120, Dancer: 1056" $
+        getDists (race 1000 constraints) `shouldBe` Map.fromList [("Comet", 1120), ("Dancer", 1056)]
+    describe "maxDistance" $ do
         it "should give 1120 in the sample situation" $
           maxDistance 1000 constraints `shouldBe` 1120
+        it "should give 37 after 1 second with the input" $
+          maxDistance 1 inputConstraints `shouldBe` 37
+        it "should give something more than 2624 after 2503 seconds with the input" $
+          maxDistance 2503 inputConstraints `shouldSatisfy` (\x -> x > 2624)
