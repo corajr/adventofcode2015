@@ -46,13 +46,12 @@ starting constraints = Map.fromList [(name x, f x) | x <- constraints]
 step :: Race
 step = do
   constraints <- ask
-  forM_ constraints $ \c -> do
-    dists <- get
-    put (Map.adjust (step1 c) (name c) dists)
+  forM_ constraints $ \c ->
+    modify (Map.adjust (step1 c) (name c))
 
 step1 :: Constraint -> Distance -> Distance
 step1 c d | flightTimeLeft d == 0 = d { restTimeLeft = restTimeLeft d - 1}
-          | restTimeLeft d == 0 = step1 c (resetTime c d)
+          | restTimeLeft d == 0 = resetTime c d
           | otherwise = d { flightTimeLeft = flightTimeLeft d - 1
                           , distance = distance d + kmPerSec c }
 
