@@ -4,6 +4,8 @@ import Text.Regex.PCRE
 import qualified Data.Map.Strict as Map
 import Control.Monad.Trans.RWS.Strict
 import Control.Monad (replicateM_, forM_)
+import Data.List (maximumBy)
+import Data.Ord (comparing)
 
 type Reindeer = String
 
@@ -14,10 +16,13 @@ data Constraint = Constraint
            , mustRest :: Int
            } deriving (Show, Eq)
 
+type Score = Int
+
 data Distance = Distance
             { distance :: Int
             , flightTimeLeft :: Int
             , restTimeLeft :: Int
+            , score :: Score
             } deriving (Show, Eq)
 
 type Distances = Map.Map String Distance
@@ -35,7 +40,7 @@ resetTime :: Constraint -> Distance -> Distance
 resetTime c d = d { flightTimeLeft = fliesFor c
                   , restTimeLeft = mustRest c }
 
-mtDistance = Distance 0 0 0
+mtDistance = Distance 0 0 0 0
 
 starting :: [Constraint] -> Distances
 starting constraints = Map.fromList [(name x, f x) | x <- constraints]
@@ -46,6 +51,11 @@ step = do
   constraints <- ask
   forM_ constraints $ \c ->
     modify (Map.adjust (step1 c) (name c))
+  dists <- get
+  let maxDist = distance . maximumBy (comparing distance) $ Map.elems dists
+  let winners = Map.keys $ Map.filter (\x -> distance x == maxDist) dists
+  forM_ winners $ \winner ->
+    modify (Map.adjust (\x -> x { score = score x + 1}) winner)
 
 step1 :: Constraint -> Distance -> Distance
 step1 c d
@@ -62,3 +72,6 @@ race seconds constraints =
 
 maxDistance :: Int -> [Constraint] -> Int
 maxDistance i c = maximum . map distance . Map.elems $ race i c
+
+maxScore :: Int -> [Constraint] -> Int
+maxScore i c = maximum . map score . Map.elems $ race i c
