@@ -50,7 +50,7 @@ step = do
 step1 :: Constraint -> Distance -> Distance
 step1 c d
   | restTimeLeft d < 0 || flightTimeLeft d < 0 = error "Should not become negative"
-  | restTimeLeft d == 0 = resetTime c d
+  | restTimeLeft d == 1 = resetTime c d
   | flightTimeLeft d == 0 = d { restTimeLeft = restTimeLeft d - 1}
   | otherwise = d { flightTimeLeft = flightTimeLeft d - 1
                   , distance = distance d + kmPerSec c }

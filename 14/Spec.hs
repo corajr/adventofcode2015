@@ -48,9 +48,9 @@ main = do
         steps !! 10 `shouldBe` cometStart { distance = 140, flightTimeLeft = 0 }
       it "should decrease restTime after 11 seconds" $
         steps !! 11 `shouldBe` cometStart { distance = 140, flightTimeLeft = 0, restTimeLeft = 126 }
-      it "should reset times after 138 seconds" $
-        steps !! 138 `shouldBe` cometStart { distance = 140 }
-      it "should increase distance after 139 seconds" $
+      it "should reset times after 137 seconds" $
+        steps !! 137 `shouldBe` cometStart { distance = 140 }
+      it "should increase distance after 138 seconds" $
         steps !! 139 `shouldBe` cometStart { distance = 154, flightTimeLeft = 9, restTimeLeft = 127 }
     describe "race" $ do
       it "after 1 second, should give Comet: 14, Dancer: 16" $
@@ -59,14 +59,14 @@ main = do
         getDists (race 10 constraints) `shouldBe` Map.fromList [("Comet", 140), ("Dancer", 160)]
       it "after 11 seconds, should give Comet: 140, Dancer: 176" $
         getDists (race 11 constraints) `shouldBe` Map.fromList [("Comet", 140), ("Dancer", 176)]
-      it "after 138 seconds, should give Comet: 140, Dancer: 176" $
-        getDists (race 138 constraints) `shouldBe` Map.fromList [("Comet", 140), ("Dancer", 176)]
-      it "after 148 seconds, should give Comet: 280, Dancer: 176" $
-        getDists (race 148 constraints) `shouldBe` Map.fromList [("Comet", 280), ("Dancer", 176)]
-      it "after 174 seconds, should give Comet: 280, Dancer: 176" $
-        getDists (race 174 constraints) `shouldBe` Map.fromList [("Comet", 280), ("Dancer", 176)]
-      it "after 185 seconds, should give Comet: 280, Dancer: 352" $
-        getDists (race 185 constraints) `shouldBe` Map.fromList [("Comet", 280), ("Dancer", 352)]
+      it "after 137 seconds, should give Comet: 140, Dancer: 176" $
+        getDists (race 137 constraints) `shouldBe` Map.fromList [("Comet", 140), ("Dancer", 176)]
+      it "after 147 seconds, should give Comet: 280, Dancer: 176" $
+        getDists (race 147 constraints) `shouldBe` Map.fromList [("Comet", 280), ("Dancer", 176)]
+      it "after 173 seconds, should give Comet: 280, Dancer: 176" $
+        getDists (race 173 constraints) `shouldBe` Map.fromList [("Comet", 280), ("Dancer", 176)]
+      it "after 183 seconds, should give Comet: 280, Dancer: 352" $
+        getDists (race 183 constraints) `shouldBe` Map.fromList [("Comet", 280), ("Dancer", 352)]
       it "after 1000 seconds, should give Comet: 1120, Dancer: 1056" $
         getDists (race 1000 constraints) `shouldBe` Map.fromList [("Comet", 1120), ("Dancer", 1056)]
     describe "maxDistance" $ do
