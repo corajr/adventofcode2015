@@ -21,9 +21,11 @@ parseIngredient x =
   in Ingredient n (read c) (read d) (read f) (read t) (read cal)
 
 score :: [Ingredient] -> [Integer] -> Integer
-score ingredients teaspoons = product . map nonNegSum . transpose $ zipWith f ingredients teaspoons
-  where f (Ingredient _ c d fl t _) i = map (i*) [c, d, fl, t]
-        nonNegSum = (\x -> if x > 0 then x else 0). sum
+score ingredients teaspoons = if theCalories == 500 then calc else 0
+  where theCalories = sum $ zipWith (\ingred i -> calories ingred * i) ingredients teaspoons
+        calc = product . map nonNegSum . transpose $ zipWith f ingredients teaspoons
+        f (Ingredient _ c d fl t _) i = map (i*) [c, d, fl, t]
+        nonNegSum = (\x -> if x > 0 then x else 0) . sum
 
 allCombos :: Int -> [[Integer]]
 allCombos n = [ xs | xs <- replicateM n [0..100], sum xs == 100]
