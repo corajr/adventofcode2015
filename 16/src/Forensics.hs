@@ -22,4 +22,10 @@ partOneCriteria =
 
 findSue :: Facts -> [Forensic] -> Maybe SueNumber
 findSue facts = fmap sueNumber . find f
-  where f (Forensic _ known) = and $ Map.elems (Map.intersectionWith (==) facts known)
+  where f (Forensic _ known) = and $ Map.elems (Map.intersectionWithKey g facts known)
+        g k fact aunt = case k of
+          "cats" -> aunt > fact
+          "trees" -> aunt > fact
+          "pomeranians" -> aunt < fact
+          "goldfish" -> aunt < fact
+          _ -> aunt == fact
