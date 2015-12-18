@@ -14,7 +14,12 @@ parseGrid input =
       m = length ls
       n = length (head ls)
       allChars = concat ls
-  in listArray ((1, 1), (m, n)) (map f allChars)
+      partOne = listArray ((1, 1), (m, n)) $ map f allChars
+  in partOne // [ ((1,1), True)
+                , ((1, n), True)
+                , ((m, 1), True)
+                , ((m, n), True)
+                ]
 
 step :: Grid -> Grid
 step = stepFromNeighbor . toNeighbor
@@ -22,9 +27,11 @@ step = stepFromNeighbor . toNeighbor
 toNeighbor :: Grid -> NeighborGrid
 toNeighbor grid = array (bounds grid) newAssocs
   where allAssocs = assocs grid
-        bound = bounds grid
+        bound@((a, b), (c,d)) = bounds grid
         newAssocs = map f allAssocs
-        f (i, e) = (i, (e, countNeighbors bound grid i))
+        f (i, e) = if i `notElem` [(a,b), (a,d), (c,b), (c,d)]
+                   then (i, (e, countNeighbors bound grid i))
+                   else (i, (True, 3))
 
 countNeighbors :: ((Int, Int), (Int, Int)) -> Grid -> (Int, Int) -> Int
 countNeighbors bound grid (a,b) = sum . map boolNum $ map (grid !) others
