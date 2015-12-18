@@ -5,7 +5,15 @@ import Data.Array.Unboxed
 type Grid = UArray (Int, Int) Bool
 
 parseGrid :: String -> Grid
-parseGrid = undefined
+parseGrid input =
+  let ls = lines input
+      f x = case x of
+        '#' -> True
+        _ -> False
+      m = length ls
+      n = length (head ls)
+      allChars = concat ls
+  in listArray ((1, 1), (m, n)) (map f allChars)
 
 step :: Grid -> Grid
 step = undefined
