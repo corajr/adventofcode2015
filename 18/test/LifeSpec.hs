@@ -2,7 +2,7 @@ module LifeSpec where
 
 import Test.Hspec
 import Life
-import Data.Array.Unboxed
+import Data.Array
 
 start = unlines [ ".#.#.#"
                 , "...##."
@@ -69,6 +69,18 @@ spec = do
   let pTwoStep = parseGrid twoStep
   let pThreeStep = parseGrid threeStep
   let pFourStep = parseGrid fourStep
+
+  describe "countNeighbors" $ do
+    let bound = bounds parsed
+    it "should return 1 in the upper left corner of start" $
+      countNeighbors bound parsed (1,1) `shouldBe` 1
+    it "should return 2 in the lower left corner of start" $
+      countNeighbors bound parsed (6,1) `shouldBe` 2
+    it "should return 3 on the fourth sample step" $ do
+      countNeighbors bound pFourStep (3,3) `shouldBe` 3
+      countNeighbors bound pFourStep (3,4) `shouldBe` 3
+      countNeighbors bound pFourStep (4,3) `shouldBe` 3
+      countNeighbors bound pFourStep (4,4) `shouldBe` 3
 
   describe "step" $
     it "should step the grid once" $ do
