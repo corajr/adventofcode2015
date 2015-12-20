@@ -8,4 +8,4 @@ main = do
   input <- parseFromFile pMedicine "input.txt"
   case input of
     Left err -> error (show err)
-    Right med -> print $ buildInSteps med
+    Right med -> print $ search med

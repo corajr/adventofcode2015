@@ -18,7 +18,9 @@ library
   exposed-modules:     Medicine, Medicine.Parser
   build-depends:       base >= 4.7 && < 5
                      , parsec
+                     , pqueue
                      , parallel
+                     , edit-distance
                      , unordered-containers
   default-language:    Haskell2010
 

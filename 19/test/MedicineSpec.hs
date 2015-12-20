@@ -30,9 +30,9 @@ spec = do
     it "should return 7 for HOHOHO" $ do
       let med = parsedMedicine { molecule = ["H", "O", "H", "O", "H", "O"]}
       getDistinctMolecules med `shouldBe` 7
-  describe "buildInSteps" $ do
+  describe "search" $ do
     it "should take 3 steps to make HOH" $
-      buildInSteps parsedBuild `shouldBe` 3
+      search parsedBuild `shouldBe` Just 3
     it "should take 6 steps to make HOHOHO" $ do
       let build = parsedBuild { molecule = ["H", "O", "H", "O", "H", "O"] }
-      buildInSteps build `shouldBe` 6
+      search build `shouldBe` Just 6
