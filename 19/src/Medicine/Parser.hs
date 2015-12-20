@@ -6,9 +6,6 @@ import           Text.ParserCombinators.Parsec
 class ToSubMap a where
   toSubMap :: a -> Map.HashMap Atom [Molecule]
 
-class ToRevMap a where
-  toRevMap :: a -> Map.HashMap Molecule Atom
-
 type Atom = String
 
 data Substitute = Substitute Atom Molecule
@@ -23,9 +20,6 @@ data Medicine = Medicine
 
 instance ToSubMap Medicine where
   toSubMap = substToMap . substitutes
-
-instance ToRevMap Medicine where
-  toRevMap = substToRevMap . substitutes
 
 pAtom = do
   a <- upper
@@ -53,7 +47,3 @@ pMedicine = do
 substToMap :: [Substitute] -> Map.HashMap Atom [Molecule]
 substToMap = foldl f Map.empty
   where f acc (Substitute a m) = Map.unionWith (++) acc (Map.singleton a [m])
-
-substToRevMap :: [Substitute] -> Map.HashMap Molecule Atom
-substToRevMap = Map.unions . map f
-  where f (Substitute a m) = Map.singleton m a
