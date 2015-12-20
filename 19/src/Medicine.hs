@@ -3,6 +3,7 @@ module Medicine ( module Medicine.Parser
                 ) where
 
 import qualified Data.Set as Set
+import Control.Parallel.Strategies
 import Control.Monad (guard)
 import Medicine.Parser
 
@@ -21,5 +22,5 @@ buildInSteps :: Medicine -> Int
 buildInSteps med = go 0 (Set.singleton ["e"])
   where go i xs
           | molecule med `Set.member` xs = i
-          | otherwise = go (i + 1) (Set.unions (map update (Set.toList xs)))
+          | otherwise = go (i + 1) (Set.unions (parMap rdeepseq update (Set.toList xs)))
         update x = getMolecules $ med { molecule = x }
