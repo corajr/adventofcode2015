@@ -2,7 +2,8 @@ module Medicine ( module Medicine.Parser
                 , module Medicine
                 ) where
 
-import qualified Data.Set as Set
+import qualified Data.HashMap.Strict as Map
+import qualified Data.HashSet as Set
 import Control.Parallel.Strategies
 import Control.Monad (guard)
 import Medicine.Parser
@@ -10,11 +11,10 @@ import Medicine.Parser
 getDistinctMolecules :: Medicine -> Int
 getDistinctMolecules = Set.size . getMolecules
 
-getMolecules :: Medicine -> Set.Set Molecule
-getMolecules (Medicine subst m) = Set.fromList $ do
-  Substitute from to <- subst
+getMolecules :: Medicine -> Set.HashSet Molecule
+getMolecules med@(Medicine _ m) = Set.fromList $ do
   (atom, i) <- zip m [0..]
-  guard (from == atom)
+  to <- Map.lookupDefault [] atom (toSubMap med)
   let (xs, _:ys) = splitAt i m
   return $ xs ++ to ++ ys
 
