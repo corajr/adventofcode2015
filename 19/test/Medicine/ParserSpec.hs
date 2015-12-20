@@ -1,4 +1,4 @@
-module Medicine.ParserSpec (main, spec, sampleMedicine) where
+module Medicine.ParserSpec (main, spec, parsedMedicine) where
 
 import Test.Hspec
 import Medicine.Parser
@@ -10,14 +10,17 @@ sampleMedicine =
   unlines [ "H => HO"
           , "H => OH"
           , "O => HH"
+          , "e => HF"
           , ""
           , "HOH"
           ]
 
+parsedMedicine :: Medicine
 parsedMedicine = Medicine subst m
   where subst = [ Substitute "H" ["H", "O"]
                 , Substitute "H" ["O", "H"]
                 , Substitute "O" ["H", "H"]
+                , Substitute "e" ["H", "F"]
                 ]
         m = ["H", "O", "H"]
 
@@ -41,6 +44,12 @@ spec = do
       parse' pMolecule "HO" `shouldBe` Right ["H", "O"]
       parse' pMolecule "HeO" `shouldBe` Right ["He", "O"]
       parse' pMolecule "CaOH" `shouldBe` Right ["Ca", "O", "H"]
+  describe "pSubstitute" $
+    it "should parse substitutions" $ do
+      parse' pSubstitute "H => HO" `shouldBe` Right (Substitute "H" ["H", "O"])
+      parse' pSubstitute "H => OH" `shouldBe` Right (Substitute "H" ["O", "H"])
+      parse' pSubstitute "O => HH" `shouldBe` Right (Substitute "O" ["H", "H"])
+      parse' pSubstitute "e => HF" `shouldBe` Right (Substitute "e" ["H", "F"])
   describe "pMedicine" $
     it "should parse the example" $
       parse' pMedicine sampleMedicine `shouldBe` Right parsedMedicine

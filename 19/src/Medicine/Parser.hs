@@ -22,10 +22,11 @@ pAtom = do
 pMolecule = many pAtom
 
 pSubstitute = do
-  atom <- pAtom
+  atom <- choice [ try pAtom
+                 , string "e" ]
   _ <- string " => "
   m <- pMolecule
-  _ <- newline
+  _ <- optional newline
   return $ Substitute atom m
 
 pMedicine :: GenParser Char st Medicine
