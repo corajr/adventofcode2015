@@ -30,7 +30,7 @@ search med =
   astar (PQ.singleton (heuristic start) (start, 0))
         Set.empty (Map.singleton start 0)
   where
-    heuristic x = if length x > length (molecule med) then maxBound else textHeuristic x
+    heuristic x = if length x > length (molecule med) then error "search node longer than real molecule" else textHeuristic x
     textHeuristic x = levenshteinDistance defaultEditCosts (concat x) (concat $ molecule med)
     astar pq seen gscore
       | PQ.null pq = Nothing
