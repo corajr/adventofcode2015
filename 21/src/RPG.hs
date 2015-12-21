@@ -67,3 +67,7 @@ equipPlayer (Equipment (Weapon weapon') maybeArmor maybeRing1 maybeRing2) =
 cheapestWin :: Stats -> Int
 cheapestWin enemy =
   minimum . map snd . filter (\(p, _) -> playerWins p enemy) $ map (first equipPlayer) allEquipment
+
+costliestLoss :: Stats -> Int
+costliestLoss enemy =
+  maximum . map snd . filter (\(p, _) -> not $ playerWins p enemy) $ map (first equipPlayer) allEquipment
