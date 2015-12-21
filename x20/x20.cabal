@@ -18,6 +18,7 @@ library
   exposed-modules:     Gifts
   build-depends:       base >= 4.7 && < 5
                      , arithmoi
+                     , containers
   default-language:    Haskell2010
 
 executable x20
