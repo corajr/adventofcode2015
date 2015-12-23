@@ -7,7 +7,7 @@ module RPG ( module RPG
 
 import qualified Data.Map.Strict as Map
 import Control.Monad.Trans.State
-import Control.Monad (when, forM_)
+import Control.Monad (when, mapM_)
 import Control.Arrow ((&&&), first)
 import RPG.Spell
 
@@ -93,8 +93,9 @@ deduct s = do
 applyStats :: SpellStats -> Game -> Game
 applyStats stats game =
   let (PS p') = modHP (spPlayerHP stats) (playerStats game)
-      p'' = p' { armor = armor p' + spPlayerArmor stats }
-      p''' = p' { mana = mana p'' + spPlayerMana stats }
+      armUp = spPlayerArmor stats
+      p'' = if armUp > 0 then p' { armor = armUp } else p'
+      p''' = p'' { mana = mana p'' + spPlayerMana stats }
       e' = modHP (spEnemyHP stats) (enemyStats game)
   in game { playerStats = PS p''', enemyStats = e' }
 
@@ -108,6 +109,8 @@ castEffect s = do
     error ("Tried to cast " ++ show s ++ " while already active")
   let actives' = Map.insert s (getEffect s) actives
   modify (\game -> game { activeEffects = actives' })
+  when (s == Shield) $
+    applyEffect (getEffect s)
 
 bossAttack :: GameState ()
 bossAttack = do
@@ -125,19 +128,27 @@ switchTurn = do
              E Enemy -> P Player
   modify (\game -> game { turn = t'})
 
-
 updateEffect :: Effect -> Maybe Effect
 updateEffect effect
   | duration' == 0 = Nothing
   | otherwise = Just $ effect { eDuration = duration' }
   where duration' = eDuration effect - 1
 
+resetArmor :: GameState ()
+resetArmor = do
+  (PS p) <- gets playerStats
+  modify (\game -> game { playerStats = PS p {armor = 0}})
+
+applyEffect :: Effect -> GameState ()
+applyEffect e = do
+  modify (applyStats (eStats e))
+  modify (\game -> game { activeEffects = Map.update updateEffect (eSpell e) (activeEffects game) })
+
 applyEffects :: GameState ()
 applyEffects = do
   actives <- gets activeEffects
-  forM_ (Map.elems actives) $ \e -> do
-    modify (applyStats (eStats e))
-    modify (\game -> game { activeEffects = Map.update updateEffect (eSpell e) (activeEffects game) })
+  resetArmor
+  mapM_ applyEffect (Map.elems actives)
 
 winner :: Game -> Maybe Side
 winner Game { playerStats = p, enemyStats = e }

@@ -51,7 +51,7 @@ getDuration :: SpellType Int -> Int
 getDuration x = case x of
   Shield -> 6
   Poison -> 6
-  Recharge -> 6
+  Recharge -> 5
 
 getEffect :: SpellType Int  -> Effect
 getEffect x = Effect x (getStats x) (getDuration x)
