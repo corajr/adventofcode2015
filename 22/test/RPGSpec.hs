@@ -3,7 +3,7 @@ module RPGSpec (main, spec) where
 import Test.Hspec
 import RPG
 import Control.Monad (replicateM)
-import Control.Monad.Trans.State
+import Data.Either (isLeft)
 import qualified Data.Map.Strict as Map
 
 main :: IO ()
@@ -47,11 +47,11 @@ spec = do
                       , spellList = []
                       , turn = E Enemy}
     it "should run one round of a fight" $
-      execState oneRound game1 `shouldBe` game2
+      execGame oneRound game1 `shouldBe` Right game2
     it "should run several rounds as expected" $ do
-      execState (replicateM 1 oneRound) game1 `shouldBe` game2
-      execState (replicateM 2 oneRound) game1 `shouldBe` game3
-      execState (replicateM 3 oneRound) game1 `shouldBe` game4
+      execGame (replicateM 1 oneRound) game1 `shouldBe` Right game2
+      execGame (replicateM 2 oneRound) game1 `shouldBe` Right game3
+      execGame (replicateM 3 oneRound) game1 `shouldBe` Right game4
     let game1' = game1 { enemyStats = BS boss2
                        , spellList = spells2 }
     let game2' = game1' { playerStats = PS me { mana = 21 }
@@ -112,15 +112,19 @@ spec = do
                          , turn = E Enemy
                          }
     it "should run several rounds of a different  game" $ do
-      execState (replicateM 1 oneRound) game1' `shouldBe` game2'
-      execState (replicateM 2 oneRound) game1' `shouldBe` game3'
-      execState (replicateM 3 oneRound) game1' `shouldBe` game4'
-      execState (replicateM 4 oneRound) game1' `shouldBe` game5'
-      execState (replicateM 5 oneRound) game1' `shouldBe` game6'
-      execState (replicateM 6 oneRound) game1' `shouldBe` game7'
-      execState (replicateM 7 oneRound) game1' `shouldBe` game8'
-      execState (replicateM 8 oneRound) game1' `shouldBe` game9'
-      execState (replicateM 9 oneRound) game1' `shouldBe` game10'
+      execGame (replicateM 1 oneRound) game1' `shouldBe` Right game2'
+      execGame (replicateM 2 oneRound) game1' `shouldBe` Right game3'
+      execGame (replicateM 3 oneRound) game1' `shouldBe` Right game4'
+      execGame (replicateM 4 oneRound) game1' `shouldBe` Right game5'
+      execGame (replicateM 5 oneRound) game1' `shouldBe` Right game6'
+      execGame (replicateM 6 oneRound) game1' `shouldBe` Right game7'
+      execGame (replicateM 7 oneRound) game1' `shouldBe` Right game8'
+      execGame (replicateM 8 oneRound) game1' `shouldBe` Right game9'
+      execGame (replicateM 9 oneRound) game1' `shouldBe` Right game10'
+    it "should throw an exception if there are not enough spells" $
+      execGame (replicateM 5 oneRound) game1 `shouldSatisfy` isLeft
+    it "should throw an exception if a spell is repeated too soon" $
+      execGame (replicateM 3 oneRound) game1 {spellList = [Later Poison, Later Poison]} `shouldSatisfy` isLeft
   describe "playerWins" $
     it "should return True if the player won fight" $ do
       playerWins (BS boss1) spells1 `shouldBe` True

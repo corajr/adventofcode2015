@@ -1,14 +1,15 @@
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE StandaloneDeriving #-}
 
 module RPG ( module RPG
            , module RPG.Spell) where
 
 import qualified Data.Map.Strict as Map
 import Control.Monad.Trans.State
-import Control.Monad (when, mapM_)
-import Control.Arrow ((&&&), first)
+import Control.Monad.Trans.Except
+import Control.Monad.Trans.Class
+import Control.Monad (when)
+import Control.Arrow ((&&&))
 import RPG.Spell
 
 data Player = Player
@@ -52,7 +53,7 @@ data Game = Game { playerStats :: Stats Player
                  , turn :: Side
                  } deriving (Show, Eq)
 
-type GameState = State Game
+type GameState = StateT Game (Except String)
 
 mtPlayer = PlayerStats 0 0 0
 mtBoss = BossStats 0 0
@@ -75,7 +76,7 @@ cast :: GameState ()
 cast = do
   xs <- gets spellList
   when (null xs) $
-    error "called cast without any spells"
+    lift $ throwE "called cast without any spells"
   let (x:spells) = xs
   deduct x
   case x of
@@ -106,7 +107,7 @@ castEffect :: SpellType Int -> GameState ()
 castEffect s = do
   actives <- gets activeEffects
   when (s `Map.member` actives) $
-    error ("Tried to cast " ++ show s ++ " while already active")
+    lift $ throwE ("Tried to cast " ++ show s ++ " while already active")
   let actives' = Map.insert s (getEffect s) actives
   modify (\game -> game { activeEffects = actives' })
   when (s == Shield) $
@@ -167,8 +168,14 @@ battle = do
     Just side -> return side
     Nothing -> battle
 
+execGame :: GameState a -> Game -> Either String Game
+execGame m = runExcept . execStateT m
+
+evalGame :: GameState a -> Game -> Either String a
+evalGame m = runExcept . evalStateT m
+
 playerWins :: Stats Enemy -> [Spell] -> Bool
-playerWins enemy spells = P Player == evalState battle game
+playerWins enemy spells = Right (P Player) == evalGame battle game
   where game = mtGame { playerStats = playerStart
                       , enemyStats = enemy
                       , spellList = spells }
