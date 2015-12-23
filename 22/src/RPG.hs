@@ -14,7 +14,8 @@ import Control.Parallel.Strategies (parMap, rdeepseq)
 import Data.String.Interpolate
 import Control.Monad (when, replicateM)
 import Data.Maybe (isJust)
-import Data.List ((\\))
+import qualified Data.Set as Set
+import Data.Set ((\\))
 import Data.Either (rights)
 import RPG.Spell
 
@@ -85,12 +86,22 @@ mtGame = Game { playerStats = PS mtPlayer
               , strategy = RandStrat
               }
 
+-- tell' :: (Monad m, Monoid w) => w -> RWST r w s m ()
+-- tell' _ = return ()
+
+tell' :: String -> GameState ()
+-- tell' = lift . tell
+tell' _ = return ()
+
 takeTurn :: GameState ()
 takeTurn = do
   t <- lift $ gets turn
   case t of
-    P Player -> cast >> switchTurn
+    P Player -> minusOne >> cast >> switchTurn
     E Enemy -> bossAttack >> switchTurn
+
+minusOne :: GameState ()
+minusOne = lift $ modify (\game -> game { playerStats = modHP (-1) (playerStats game) })
 
 cast :: GameState ()
 cast = do
@@ -133,7 +144,7 @@ castEffect s = do
     throwE ("Tried to cast " ++ show s ++ " while already active")
   let actives' = Map.insert s (getEffect s) actives
   lift $ modify (\game -> game { activeEffects = actives' })
-  lift $ tell [i|Player casts #{s}\n|]
+  tell' [i|Player casts #{s}\n|]
   when (s == Shield) $
     applyEffect (getEffect s)
 
@@ -143,7 +154,7 @@ bossAttack = do
   play@(PS p) <- lift $ gets playerStats
   let amt = damage enemy - armor p
       p' = modHP (-amt) play
-  lift $ tell [i|Boss attacks for #{amt} damage!\n|]
+  tell' [i|Boss attacks for #{amt} damage!\n|]
   lift $ modify (\game -> game { playerStats = p'})
 
 switchTurn :: GameState ()
@@ -171,8 +182,8 @@ applyEffect e = do
   lift $ modify (\game -> game { activeEffects = Map.update updateEffect (eSpell e) (activeEffects game) })
   e' <- lift $ gets (Map.lookup (eSpell e) . activeEffects)
   case e' of
-    Just e'' -> lift $ tell [i|#{eSpell e''}; its timer is now #{eDuration e''}.\n|]
-    Nothing -> lift $ tell [i|#{eSpell e} wears off.\n|]
+    Just e'' -> tell' [i|#{eSpell e''}; its timer is now #{eDuration e''}.\n|]
+    Nothing -> tell' [i|#{eSpell e} wears off.\n|]
 
 applyEffects :: GameState ()
 applyEffects = do
@@ -191,7 +202,7 @@ checkIfWon :: GameState ()
 checkIfWon = do
   w <- lift $ gets checkWinner
   when (isJust w) $
-    lift $ tell [i|#{w} wins.\n|]
+    tell' [i|#{w} wins.\n|]
   lift $ modify (\game -> game { winner = w } )
 
 oneRound :: GameState ()
@@ -199,7 +210,7 @@ oneRound = applyEffects >> takeTurn
 
 battle :: GameState (Side, Int)
 battle = do
-  tellTurn
+  -- tellTurn
   oneRound
   won <- lift $ gets winner
   case won of
@@ -214,10 +225,10 @@ tellTurn = do
   (PS p) <- lift $ gets playerStats
   (BS e) <- lift $ gets enemyStats
   case t of
-    P Player -> lift $ tell "-- Player turn --\n"
-    E Enemy -> lift $ tell "-- Boss turn --\n"
-  lift $ tell [i|- Player has #{hp p} hit points, #{armor p} armor, #{mana p} mana\n|]
-  lift $ tell [i|- Boss has #{hp' e} hit points\n|]
+    P Player -> tell' "-- Player turn --\n"
+    E Enemy -> tell' "-- Boss turn --\n"
+  tell' [i|- Player has #{hp p} hit points, #{armor p} armor, #{mana p} mana\n|]
+  tell' [i|- Boss has #{hp' e} hit points\n|]
 
 runGame :: GameState a -> Game -> StdGen -> (Either String a, Game, String)
 runGame m g gen = (`evalRand` gen) . (\m' -> runRWST m' () g) $ runExceptT m
@@ -239,13 +250,16 @@ playGame :: Stats Enemy -> [Spell] -> Either String Side
 playGame e spells' = fst <$> evalGame battle game (mkStdGen 0)
   where game = mkGame e (Just spells')
 
+spellSet :: Set.Set Spell
+spellSet = Set.fromList spells
+
 randStrat :: GameState Spell
 randStrat = do
   actives <- lift $ gets activeEffects
   (PS p) <- lift $ gets playerStats
   let manaRemaining = mana p
-      spells' = spells \\ map Later (Map.keys actives)
-      spells'' = filter ((< manaRemaining) . cost) spells'
+      spells' = spellSet \\ Set.map Later (Map.keysSet actives)
+      spells'' = filter ((< manaRemaining) . cost) $ Set.toList spells'
   when (null spells'') $
     throwE "No spells available"
   lift $ uniform spells''
@@ -289,7 +303,7 @@ randGame enemy = evalGame battle game
 cheapestWin :: Stats Enemy -> IO Int
 cheapestWin enemy = fmap (minimum . map snd . filter ((==) (P Player) . fst) . rights) games
   where games :: IO [Either String (Side, Int)]
-        games = replicateM 100000 oneGame
+        games = replicateM 1000000 oneGame
         oneGame = do
           gen <- newStdGen
           return (randGame enemy gen)

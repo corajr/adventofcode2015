@@ -25,7 +25,7 @@ data SpellStats =
 
 data Spell = Now (SpellType ())
            | Later (SpellType Int)
-           deriving (Show, Eq)
+           deriving (Show, Eq, Ord)
 
 data Effect =
   Effect { eSpell :: SpellType Int
