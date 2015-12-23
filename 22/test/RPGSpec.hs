@@ -19,6 +19,13 @@ spec = do
       game1 = mtGame { playerStats = PS me
                      , enemyStats = BS boss1
                      , spellList = spells1 }
+      spells2 = [ Later Recharge
+                  , Later Shield
+                  , Now Drain
+                  , Later Poison
+                  , Now MagicMissile
+                  ]
+      boss2 = BossStats 14 8
       poison = getEffect Poison
       recharge = getEffect Recharge
       shield = getEffect Shield
@@ -45,13 +52,6 @@ spec = do
       execState (replicateM 1 oneRound) game1 `shouldBe` game2
       execState (replicateM 2 oneRound) game1 `shouldBe` game3
       execState (replicateM 3 oneRound) game1 `shouldBe` game4
-    let spells2 = [ Later Recharge
-                  , Later Shield
-                  , Now Drain
-                  , Later Poison
-                  , Now MagicMissile
-                  ]
-    let boss2 = BossStats 14 8
     let game1' = game1 { enemyStats = BS boss2
                        , spellList = spells2 }
     let game2' = game1' { playerStats = PS me { mana = 21 }
@@ -124,3 +124,4 @@ spec = do
   describe "playerWins" $
     it "should return True if the player won fight" $ do
       playerWins (BS boss1) spells1 `shouldBe` True
+      playerWins (BS boss2) spells2 `shouldBe` True
