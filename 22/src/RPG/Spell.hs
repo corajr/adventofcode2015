@@ -3,7 +3,6 @@
 module RPG.Spell where
 
 import qualified Data.Map.Strict as Map
-import Control.Arrow ((&&&))
 
 data SpellType a where
   MagicMissile :: SpellType ()
@@ -62,3 +61,43 @@ cost x =
     Now s -> f s
     Later s -> f s
   where f = spCost . getStats
+
+spells = [ Now MagicMissile
+         , Now Drain
+         , Later Shield
+         , Later Poison
+         , Later Recharge]
+
+validSequence :: [Spell] -> Bool
+validSequence spells' = notInRange (Later Shield) 2 && notInRange (Later Poison) 2 && notInRange (Later Recharge) 2
+  where notInRange x n = and [all (\(a,b) -> a /= b || (a == b && a /= x)) (zip (shifted i) spells') | i <- [1..n]]
+        shifted n = drop n spells'
+
+-- getSequenceOf :: Int -> IO [Spell]
+-- getSequenceOf i = do
+--   xs <- runRVar (choices i spells) StdRandom
+--   if validSequence xs
+--     then return xs
+--     else getSequenceOf i
+
+-- spellSequences :: IO [[Spell]]
+-- spellSequences = return [[ Later Shield
+--                          , Later Recharge
+--                          , Later Poison
+--                          , Later Shield
+--                          , Later Recharge
+--                          , Later Poison
+--                          , Later Shield
+--                          , Later Recharge
+--                          , Later Poison
+--                          , Later Shield
+--                          , Later Recharge
+--                          , Later Poison
+--                          , Now MagicMissile
+--                          , Now MagicMissile
+--                          ]]
+
+-- spellSequences :: IO [[Spell]]
+-- spellSequences =
+--   fmap concat . forM [13..13] $ \i ->
+--     replicateM 1000 (getSequenceOf i)

@@ -19,6 +19,10 @@ library
   build-depends:       base >= 4.7 && < 5
                      , transformers
                      , containers
+                     , interpolate
+                     , parallel
+                     , random
+                     , MonadRandom
   default-language:    Haskell2010
 
 executable x22

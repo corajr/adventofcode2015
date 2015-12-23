@@ -2,7 +2,9 @@ module Main where
 
 import RPG
 
-bossStats = BossStats 71 10
+bossStats = BS $ BossStats 71 10
 
 main :: IO ()
-main = print $ cheapestWin bossStats
+main = do
+  cheap <- cheapestWin bossStats
+  print cheap
