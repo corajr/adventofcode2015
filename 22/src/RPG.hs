@@ -10,8 +10,9 @@ import Control.Monad.Trans.RWS
 import Control.Monad.Trans.Except
 import Control.Monad.Trans.Class
 import Control.Monad.Random
+import Control.Parallel.Strategies (parMap, rdeepseq)
 import Data.String.Interpolate
-import Control.Monad (when)
+import Control.Monad (when, replicateM)
 import Data.Maybe (isJust)
 import Data.List ((\\))
 import Data.Either (rights)
@@ -288,8 +289,8 @@ randGame enemy = evalGame battle game
 cheapestWin :: Stats Enemy -> IO Int
 cheapestWin enemy = fmap (minimum . map snd . filter ((==) (P Player) . fst) . rights) games
   where games :: IO [Either String (Side, Int)]
-        games = mapM oneGame [1..1000000]
-        oneGame _ = do
+        games = replicateM 100000 oneGame
+        oneGame = do
           gen <- newStdGen
           return (randGame enemy gen)
   -- fmap (map (runGame battle . mkGame enemy &&& (sum . map cost))) spellSequences
