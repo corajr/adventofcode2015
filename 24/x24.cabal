@@ -1,0 +1,44 @@
+name:                x24
+version:             0.1.0.0
+synopsis:            Initial project template from stack, using hspec and quickcheck
+description:         Please see README.md
+homepage:            http://github.com/githubuser/x24#readme
+license:             BSD3
+license-file:        LICENSE
+author:              Example Author Name
+maintainer:          example@example.com
+copyright:           2010 Author Here
+category:            Web
+build-type:          Simple
+-- extra-source-files:
+cabal-version:       >=1.10
+
+library
+  hs-source-dirs:      src
+  exposed-modules:     Quantum
+  build-depends:       base >= 4.7 && < 5
+                     , containers
+  default-language:    Haskell2010
+
+executable x24
+  hs-source-dirs:      app
+  main-is:             Main.hs
+  ghc-options:         -threaded -O2 -rtsopts -with-rtsopts=-N
+  build-depends:       base
+                     , x24
+  default-language:    Haskell2010
+
+test-suite x24-test
+  type:                exitcode-stdio-1.0
+  hs-source-dirs:      test
+  main-is:             Spec.hs
+  build-depends:       base
+                     , x24
+                     , hspec
+                     , QuickCheck
+  ghc-options:         -threaded -rtsopts -with-rtsopts=-N
+  default-language:    Haskell2010
+
+source-repository head
+  type:     git
+  location: https://github.com/githubuser/x24
