@@ -23,10 +23,10 @@ sum' = sum . Set.toList
 arrangements :: [Package] -> [Arrangement]
 arrangements packages = ar
   where n = length packages
-        ar = sortBy (comparing product) . filter ((< n `div` 3) . length) $ subsequences packages
+        ar = sortBy (comparing product) . filter ((< n `div` 4) . length) $ subsequences packages
 
 bestEntanglement :: [Package] -> Int
 bestEntanglement packages = head . map product . filter valid $ arrangements packages
   where valid arr = let others = packSet \\ Set.fromList arr
-                    in sum' others == 2 * sum arr
+                    in sum' others == 3 * sum arr
         packSet = Set.fromList packages
