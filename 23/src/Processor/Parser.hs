@@ -18,6 +18,8 @@ data Instruction = Halve Register
                  | JumpIfOne Register Offset
                  deriving (Show, Eq)
 
+type Program = Vector Instruction
+
 pRegister :: GenParser Char st Register
 pRegister = do
   reg <- string "a" <|> string "b"
@@ -59,7 +61,7 @@ pInstruction = do
 pInstructions :: GenParser Char st (Vector Instruction)
 pInstructions = fromList <$> pInstruction `endBy` newline <* eof
 
-parse' :: String -> Either String (Vector Instruction)
+parse' :: String -> Either String Program
 parse' = f . parse pInstructions ""
   where f (Left err) = Left $ show err
         f (Right x) = Right x
